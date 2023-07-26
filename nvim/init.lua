@@ -1,5 +1,7 @@
 require("plugins")
 vim.g.mapleader = " "
+-- line numbers
+vim.wo.number = true
 -- ESCAPING QUICKLY
 -- -- lua, default settings
 require("better_escape").setup({
@@ -13,54 +15,64 @@ require("better_escape").setup({
 	-- end,
 })
 -- Automatically start coq
-vim.g.coq_settings = { auto_start = "shut-up" }
---LSP
--- Setup language servers.
-local lspconfig = require("lspconfig")
-lspconfig.pyright.setup({})
-lspconfig.tsserver.setup({})
-lspconfig.rust_analyzer.setup({
-	-- Server-specific settings. See `:help lspconfig-setup`
-	settings = {
-		["rust-analyzer"] = {},
-	},
-})
-
+vim.g.coq_settings = { auto_start = "true" }
+vim.g.coq_settings = { keymap = { eval_snips = "<leader>j" } }
 -- Global mappings.
 -- See `:help vim.diagnostic.*` for documentation on any of the below functions
 vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
 vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
 vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
 vim.keymap.set("n", "<space>q", vim.diagnostic.setloclist)
+--LSP
+-- Setup language servers.
+local coq = require("coq") -- add this
+-- Setup language servers.
+local lspconfig = require('lspconfig')
+lspconfig.pyright.setup {}
+lspconfig.tsserver.setup {}
+lspconfig.rust_analyzer.setup {
+  -- Server-specific settings. See `:help lspconfig-setup`
+  settings = {
+    ['rust-analyzer'] = {},
+  },
+}
+
+
+-- Global mappings.
+-- See `:help vim.diagnostic.*` for documentation on any of the below functions
+vim.keymap.set('n', '<space>e', vim.diagnostic.open_float)
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev)
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next)
+vim.keymap.set('n', '<space>q', vim.diagnostic.setloclist)
 
 -- Use LspAttach autocommand to only map the following keys
 -- after the language server attaches to the current buffer
-vim.api.nvim_create_autocmd("LspAttach", {
-	group = vim.api.nvim_create_augroup("UserLspConfig", {}),
-	callback = function(ev)
-		-- Enable completion triggered by <c-x><c-o>
-		vim.bo[ev.buf].omnifunc = "v:lua.vim.lsp.omnifunc"
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = vim.api.nvim_create_augroup('UserLspConfig', {}),
+  callback = function(ev)
+    -- Enable completion triggered by <c-x><c-o>
+    vim.bo[ev.buf].omnifunc = 'v:lua.vim.lsp.omnifunc'
 
-		-- Buffer local mappings.
-		-- See `:help vim.lsp.*` for documentation on any of the below functions
-		local opts = { buffer = ev.buf }
-		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-		vim.keymap.set("n", "<space>wa", vim.lsp.buf.add_workspace_folder, opts)
-		vim.keymap.set("n", "<space>wr", vim.lsp.buf.remove_workspace_folder, opts)
-		vim.keymap.set("n", "<space>wl", function()
-			print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
-		end, opts)
-		vim.keymap.set("n", "<space>D", vim.lsp.buf.type_definition, opts)
-		vim.keymap.set("n", "<space>rn", vim.lsp.buf.rename, opts)
-		vim.keymap.set({ "n", "v" }, "<space>ca", vim.lsp.buf.code_action, opts)
-		vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
-		vim.keymap.set("n", "<leader>f", function()
-			vim.lsp.buf.format({ async = true })
-		end, opts)
-	end,
+    -- Buffer local mappings.
+    -- See `:help vim.lsp.*` for documentation on any of the below functions
+    local opts = { buffer = ev.buf }
+    vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+    vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+    vim.keymap.set('n', '<space>wa', vim.lsp.buf.add_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wr', vim.lsp.buf.remove_workspace_folder, opts)
+    vim.keymap.set('n', '<space>wl', function()
+      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, opts)
+    vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
+    vim.keymap.set('n', '<space>rn', vim.lsp.buf.rename, opts)
+    vim.keymap.set({ 'n', 'v' }, '<space>ca', vim.lsp.buf.code_action, opts)
+    vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+    vim.keymap.set('n', '<space>f', function()
+      vim.lsp.buf.format { async = true }
+    end, opts)
+  end,
 })
 -- STATUSLINE
 require("lualine").setup({
@@ -106,8 +118,7 @@ require("lualine").setup({
 
 -- Theming
 vim.o.background = "dark" -- or "light" for light mode
-vim.cmd([[colorscheme gruvbox]])
-
+vim.cmd("colorscheme rose-pine")
 -- tree
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
@@ -119,7 +130,7 @@ vim.opt.termguicolors = true
 require("nvim-tree").setup({
 	sort_by = "case_sensitive",
 	view = {
-		width = 30,
+		width = 40,
 	},
 	renderer = {
 		group_empty = true,
@@ -143,7 +154,7 @@ local function my_on_attach(bufnr)
 	vim.keymap.set("n", "<C-k>", ":NvimTreeToggle<CR>", { silent = true })
 	vim.keymap.set("n", "?", api.tree.toggle_help, opts("Help"))
 end
-vim.keymap.set("n", "<C-k>", ":NvimTreeToggle<CR>", { silent = true })
+vim.keymap.set("n", "<leader>k", ":NvimTreeToggle<CR>", { silent = true })
 
 -- telescope
 local builtin = require("telescope.builtin")
@@ -215,8 +226,8 @@ local null_ls = require("null-ls")
 
 null_ls.setup({
 	sources = {
-		null_ls.builtins.formatting.stylua,
 		null_ls.builtins.formatting.prettier,
+		null_ls.builtins.formatting.eslint,
 		null_ls.builtins.diagnostics.eslint,
 		null_ls.builtins.completion.spell,
 	},
@@ -251,4 +262,53 @@ local no_really = {
 }
 
 null_ls.register(no_really)
+require("null-ls").setup({
+	debug = true,
+})
+local helpers = require("null-ls.helpers")
+
+local markdownlint = {
+	method = null_ls.methods.DIAGNOSTICS,
+	filetypes = { "markdown" },
+	-- null_ls.generator creates an async source
+	-- that spawns the command with the given arguments and options
+	generator = null_ls.generator({
+		command = "markdownlint",
+		args = { "--stdin" },
+		to_stdin = true,
+		from_stderr = true,
+		-- choose an output format (raw, json, or line)
+		format = "line",
+		check_exit_code = function(code, stderr)
+			local success = code <= 1
+
+			if not success then
+				-- can be noisy for things that run often (e.g. diagnostics), but can
+				-- be useful for things that run on demand (e.g. formatting)
+				print(stderr)
+			end
+
+			return success
+		end,
+		-- use helpers to parse the output from string matchers,
+		-- or parse it manually with a function
+		on_output = helpers.diagnostics.from_patterns({
+			{
+				pattern = [[:(%d+):(%d+) [%w-/]+ (.*)]],
+				groups = { "row", "col", "message" },
+			},
+			{
+				pattern = [[:(%d+) [%w-/]+ (.*)]],
+				groups = { "row", "message" },
+			},
+		}),
+	}),
+}
+
+null_ls.register(markdownlint)
+
 vim.keymap.set("n", "<leader>fm", ":lua vim.lsp.buf.format()<CR>", { silent = true })
+-- Autopairs
+require("nvim-autopairs").setup({
+	disable_filetype = { "TelescopePrompt", "vim" },
+})

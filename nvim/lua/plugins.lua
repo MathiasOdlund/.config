@@ -34,6 +34,7 @@ return require("packer").startup(function(use)
 
 	-- themeing
 	use({ "ellisonleao/gruvbox.nvim" })
+	use({ "rose-pine/neovim", as = "rose-pine" })
 	-- formating
 	use("sbdchd/neoformat")
 	--telescope
@@ -67,6 +68,12 @@ return require("packer").startup(function(use)
 		end,
 		requires = { "nvim-lua/plenary.nvim" },
 	})
-
 	use("rcarriga/nvim-notify")
+	-- auto pairs
+	use({
+		"windwp/nvim-autopairs",
+		config = function()
+			require("nvim-autopairs").setup({})
+		end,
+	})
 end)
